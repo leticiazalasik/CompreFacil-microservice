@@ -3,20 +3,26 @@ require("dotenv").config();
 const telegramService = require('../services/telegram.service');
 
 class RabbitMQHandler {
+
+  constructor(){
+    this.connection = null
+    this.channel = null
+  }
+
   async connect(retries = 5, delay = 3000) {
     for (let i = 0; i < retries; i++) {
       try {
-        const connection = await amqp.connect(process.env.RABBITMQ_URL);
-        const channel = await connection.createChannel();
+        this.connection = await amqp.connect(process.env.RABBITMQ_URL);
+        this.channel = await this.connection.createChannel();
         const queue = "notificacoes";
 
-        await channel.assertQueue(queue);
+        await this.channel.assertQueue(queue);
 
         console.log(
           "Conectado ao RabbitMQ! Esperando por mensagens na fila:",
           queue,
         );
-        channel.consume(queue, async (msg) => {
+        this.channel.consume(queue, async (msg) => {
           if (msg !== null) {
             try {
               const payload = JSON.parse(msg.content.toString());
@@ -26,11 +32,11 @@ class RabbitMQHandler {
               await telegramService.sendNotification(payload);
 
               // Confirma a leitura para retirar da fila definitivamente
-              channel.ack(msg);
+              this.channel.ack(msg);
             } catch (error) {
               console.error("Erro no processamento da notificação:", error);
               // Em caso de erro grave (ex: payload mal formado), tira da fila para não travar
-              channel.ack(msg);
+              this.channel.ack(msg);
             }
           }
         });

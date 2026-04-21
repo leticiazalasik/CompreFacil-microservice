@@ -1,5 +1,5 @@
 const db = require("../configs/database.config");
-const ns = require("./notification.service");
+const rbt = require("../configs/rabbitmq.config");
 
 class TransactionService {
   async salvaTransacao(usuario, valor) {
@@ -10,6 +10,7 @@ class TransactionService {
         [usuario, valor],
       );
       const transacao = result.rows[0];
+      return transacao;
     } catch (e) {
       throw e;
     }
@@ -22,7 +23,7 @@ class TransactionService {
       usuario: transacao.usuario,
       valor: transacao.valor,
     });
-    ns.publicaMensagem(mensagem);
+    rbt.enviaMensagem(mensagem);
   }
 }
 
