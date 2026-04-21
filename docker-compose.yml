@@ -3,7 +3,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:15
-    container_name: postgres_db
+    container_name: postgres_comprefacil
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -16,14 +16,47 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: rabbitmq_comprefacil
     restart: always
     ports:
-      - "5672:5672"   # comunicação AMQP
-      - "15672:15672" # interface web
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
+
+  # --- NOVOS SERVIÇOS ADICIONADOS ---
+
+  payment-service:
+    build:
+      context: ./payment-service # Aponta para a pasta onde está o Dockerfile do pagamento
+    container_name: payment_api
+    restart: always
+    ports:
+      - "3001:3001" # Porta definida no seu README
+    environment:
+      - PORT=3001
+      # Note que o host mudou de localhost para 'postgres' e 'rabbitmq'
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/payment_db
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  notification-service:
+    build:
+      context: ./notification-service # Aponta para a pasta onde está o Dockerfile da notificação
+    container_name: notification_api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - TELEGRAM_TOKEN=8535385718:AAEGQeZCkMfjc42a3WzUJo-tHMCCEplr9aM
+      - TELEGRAM_CHAT_ID=7112630460
+    depends_on:
+      - rabbitmq
 
 volumes:
   postgres_data:
