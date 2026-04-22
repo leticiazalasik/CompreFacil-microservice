@@ -38,6 +38,31 @@ class TransactionService {
     });
     rbt.enviaMensagem(mensagem);
   }
+
+  notificarPagamentoConfirmado(transacao) {
+    const mensagem = JSON.stringify({
+      tipo: "PAGAMENTO_CONFIRMADO",
+      transacaoId: transacao.id,
+      usuario: transacao.usuario,
+      valor: transacao.valor,
+    });
+
+    rbt.enviaMensagem(mensagem);
+  }
+
+  async confirmaTransacao(id) {
+    const pool = await db.getPool();
+
+    const result = await pool.query(
+      `UPDATE transacoes
+     SET status = 'sucesso'
+     WHERE id = $1
+     RETURNING *`,
+      [id],
+    );
+
+    return result.rows[0];
+  }
 }
 
 module.exports = new TransactionService();

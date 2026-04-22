@@ -10,7 +10,7 @@ class TransactionController {
 
     try {
       //Armazena a transação com status pendente
-      let transacao = await ts.salvaTransacao(usuario,valor)
+      let transacao = await ts.salvaTransacao(usuario, valor);
       console.log("Transação salva:", transacao);
 
       //Publica mensagem na fila para o serviço de notificação
@@ -22,7 +22,7 @@ class TransactionController {
       ts.notificarTransacao(transacao)
 
       res.status(201).json({
-        mensagem: "Transação recebida com status pendente",
+        mensagem: "Transação criada e confirmada",
         transacao,
       });
     } catch (err) {

@@ -53,8 +53,8 @@ services:
     environment:
       - PORT=3000
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
-      - TELEGRAM_TOKEN=8535385718:AAEGQeZCkMfjc42a3WzUJo-tHMCCEplr9aM
-      - TELEGRAM_CHAT_ID=7112630460
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
     depends_on:
       - rabbitmq
 
