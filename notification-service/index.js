@@ -10,9 +10,15 @@ app.get("/", (req, res) => {
   res.send("Sistema de Notificação em Funcionamento!");
 });
 
+async function iniciarServidor() {
+  try {
+    await rabbitmqConfig.connect();
+    app.listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+    });
+  } catch (error) {
+    console.error("Erro ao iniciar Notification Service:", error);
+  }
+}
 
-
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-  rabbitmqConfig.connect()
-});
+iniciarServidor();

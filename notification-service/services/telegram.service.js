@@ -13,13 +13,21 @@ class TelegramService {
   async sendNotification(transactionData) {
     if (!this.token || !this.chatId) return;
 
+    let titulo = "Nova Transação Recebida!";
+    let status = "Pendente";
+
+    if (transactionData.tipo === "PAGAMENTO_CONFIRMADO") {
+      titulo = "Pagamento Confirmado!";
+      status = "Sucesso";
+    }
+
     // Formatação amigável da mensagem
     const text = `
-🛒 <b>Nova Transação Recebida!</b>
+ <b>${titulo}</b>
 <b>ID:</b> #${transactionData.transacaoId || "N/A"}
 <b>Cliente:</b> ${transactionData.usuario || "N/A"}
 <b>Valor:</b> R$ ${transactionData.valor || "0.00"}
-<b>Status:</b> ${transactionData.status || "Pendente"}
+<b>Status:</b> ${status}
         `;
 
     const url = `https://api.telegram.org/bot${this.token}/sendMessage`;
