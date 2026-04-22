@@ -16,6 +16,11 @@ class TransactionController {
       //Publica mensagem na fila para o serviço de notificação
       ts.notificarTransacao(transacao);
 
+      //Confirma a transação
+      transacao = await ts.confirmarTransacao(transacao);
+
+      ts.notificarTransacao(transacao)
+
       res.status(201).json({
         mensagem: "Transação recebida com status pendente",
         transacao,

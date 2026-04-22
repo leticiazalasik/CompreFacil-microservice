@@ -16,12 +16,25 @@ class TransactionService {
     }
   }
 
-  notificarTransacao(transacao) {
+  async confirmarTransacao(transacao){
+    const pool = await db.getPool();
+    try{
+      const result = await pool.query(`update transacoes set status = 'sucesso' where id = $1 returning *`,
+        [transacao.id]
+      )
+      const novaTransacao = result.rows[0];
+      return novaTransacao;
+    }catch(e){
+      throw e;
+    }
+  }
+
+  notificarTransacao(transacao,tipo) {
     const mensagem = JSON.stringify({
-      tipo: "SOLICITACAO_RECEBIDA",
       transacaoId: transacao.id,
       usuario: transacao.usuario,
       valor: transacao.valor,
+      status:transacao.status
     });
     rbt.enviaMensagem(mensagem);
   }
