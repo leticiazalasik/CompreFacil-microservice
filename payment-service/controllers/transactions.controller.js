@@ -16,15 +16,10 @@ class TransactionController {
       //Publica mensagem na fila para o serviço de notificação
       ts.notificarTransacao(transacao);
 
-      // Simula processamento do pagamento
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      //Confirma a transação
+      transacao = await ts.confirmarTransacao(transacao);
 
-      // confirma pagamento
-      transacao = await ts.confirmaTransacao(transacao.id);
-
-      //Notificar o sucesso do pagamento
-      ts.notificarPagamentoConfirmado(transacao);
-      console.log("Pagamento confirmado:", transacao);
+      ts.notificarTransacao(transacao)
 
       res.status(201).json({
         mensagem: "Transação criada e confirmada",
